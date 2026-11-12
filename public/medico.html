@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Estação do Médico / Atendente</title>
+    <style>
+        body { background: #0f172a; color: white; font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px; box-sizing: border-box; }
+        .container { width: 450px; background: #1e293b; padding: 30px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+        h2 { text-align: center; color: #38bdf8; margin-top: 0; }
+        label { color: #94a3b8; font-size: 0.9rem; font-weight: bold; display: block; margin-top: 15px; }
+        select, button { width: 100%; padding: 12px; margin-top: 8px; border-radius: 8px; border: none; font-size: 1rem; box-sizing: border-box; }
+        select { background: #334155; color: white; }
+
+        .btn-salvar { background: #3b82f6; color: white; font-weight: bold; cursor: pointer; margin-top: 20px; }
+        .btn-salvar:hover { background: #2563eb; }
+
+        .painel-atendimento { display: none; }
+        .atual { background: #0f172a; padding: 20px; border-radius: 10px; text-align: center; margin: 20px 0; border: 1px solid #334155; }
+        .btn-chamar { background: #22c55e; color: white; font-weight: bold; cursor: pointer; font-size: 1.2rem; }
+        .btn-chamar:hover { background: #16a34a; }
+        .btn-rechamar { background: #f59e0b; color: white; font-weight: bold; cursor: pointer; display: none; margin-top: 10px; }
+        .btn-trocar { background: #64748b; color: white; font-size: 0.9rem; margin-top: 15px; cursor: pointer; }
+
+        .fila-item { background: #334155; padding: 10px 15px; border-radius: 6px; margin-top: 8px; display: flex; justify-content: space-between; align-items: center; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- SEÇÃO DE LOGIN / SELEÇÃO DE SALA -->
+    <div id="divLogin">
+        <h2>Identificação do Médico</h2>
+
+        <label>Selecione seu Consultório:</label>
+        <select id="selConsultorio">
+            <option value="Consultório 01">Consultório 01</option>
+            <option value="Consultório 02">Consultório 02</option>
+            <option value="Consultório 03">Consultório 03</option>
+            <option value="Triagem">Triagem</option>
+        </select>
+
+        <label>Seu Nome / Especialidade:</label>
+        <select id="selMedico">
+            <option value="Dr. Carlos Silva">Dr. Carlos Silva (Clínico Geral)</option>
+            <option value="Dra. Ana Souza">Dra. Ana Souza (Pediatria)</option>
+            <option value="Dr. Roberto Mendes">Dr. Roberto Mendes (Cardiologia)</option>
+            <option value="Enfermeira Juliana">Enfermeira Juliana (Triagem)</option>
+        </select>
+
+        <button class="btn-salvar" onclick="entrarConsultorio()">Entrar no Consultório</button>
+    </div>
+
+    <!-- SEÇÃO DE ATENDIMENTO (Oculta até o médico fazer o login na tela) -->
+    <div id="divPainel" class="painel-atendimento">
+        <h2 id="tituloSala" style="color: #4ade80; margin-bottom: 5px;">Consultório --</h2>
+        <small id="subMedico" style="color: #94a3b8; display:block; text-align:center; margin-bottom: 20px;">--</small>
+
+        <div class="atual">
+            <small style="color: #94a3b8;">PACIENTE EM ATENDIMENTO:</small>
+            <h1 id="pacienteAtual" style="color: #f8fafc; margin: 10px 0; font-size: 1.8rem;">Nenhum</h1>
+            <button id="btnRechamar" class="btn-rechamar" onclick="rechamar()">🔊 Chamar Novamente na TV</button>
+        </div>
+
+        <button class="btn-chamar" onclick="chamarProximo()">Chamar Próximo Paciente</button>
+
+        <h3 style="margin-top: 25px; font-size: 1.1rem;">Aguardando nesta fila (<span id="qtdSala">0</span>):</h3>
+        <div id="minhaFila" style="max-height: 200px; overflow-y: auto;"></div>
+
+        <button class="btn-trocar" onclick="trocarConsultorio()">⬅ Trocar de Consultório / Sair</button>
+    </div>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+    const socket = io();
+    let filaCompleta = [];
+    let meuConsultorioAtual = '';
+    let meuMedicoAtual = '';
+    let ultimoChamadoPorMim = null;
+
+    // Verifica se já estava logado neste navegador anteriormente
+    window.addEventListener('load', () => {
+        const salvoConsultorio = localStorage.getItem('medico_consultorio');
+        const salvoMedico = localStorage.getItem('medico_nome');
+        if (salvoConsultorio && salvoMedico) {
+            meuConsultorioAtual = salvoConsultorio;
+            meuMedicoAtual = salvoMedico;
+            mostrarPainelAtendimento();
+        }
+    });
+
+    function entrarConsultorio() {
+        meuConsultorioAtual = document.getElementById('selConsultorio').value;
+        meuMedicoAtual = document.getElementById('selMedico').value;
+
+        // Salva no navegador para não precisar escolher toda vez que atualizar a página
+        localStorage.setItem('medico_consultorio', meuConsultorioAtual);
+        localStorage.setItem('medico_nome', meuMedicoAtual);
+
+        mostrarPainelAtendimento();
+    }
+
+    function mostrarPainelAtendimento() {
+        document.getElementById('divLogin').style.display = 'none';
+        document.getElementById('divPainel').style.display = 'block';
+
+        document.getElementById('tituloSala').innerText = meuConsultorioAtual;
+        document.getElementById('subMedico').innerText = meuMedicoAtual;
+
+        filtrarMinhaFila();
+    }
+
+    function trocarConsultorio() {
+        localStorage.removeItem('medico_consultorio');
+        localStorage.removeItem('medico_nome');
+        document.getElementById('divPainel').style.display = 'none';
+        document.getElementById('divLogin').style.display = 'block';
+    }
+
+    function chamarProximo() {
+        socket.emit('medico-chamar-proximo', { consultorio: meuConsultorioAtual });
+    }
+
+    function rechamar() {
+        if (ultimoChamadoPorMim) {
+            socket.emit('medico-rechamar', ultimoChamadoPorMim);
+        }
+    }
+
+    function filtrarMinhaFila() {
+        if (!meuConsultorioAtual) return;
+
+        const filtrados = filaCompleta.filter(p => p.consultorio.toLowerCase() === meuConsultorioAtual.toLowerCase());
+
+        document.getElementById('qtdSala').innerText = filtrados.length;
+        const container = document.getElementById('minhaFila');
+
+        if (filtrados.length === 0) {
+            container.innerHTML = '<div style="color: #64748b; text-align: center; padding: 15px;">Nenhum paciente na fila</div>';
+            return;
+        }
+
+        container.innerHTML = filtrados.map(p => `
+            <div class="fila-item">
+                <div>
+                    <strong style="color: #4ade80;">${p.senha}</strong> - ${p.nome}
+                </div>
+                <div>
+                    <small style="color: #fbbf24;">${p.preferencial ? '⭐ Preferencial' : 'Normal'}</small>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    socket.on('estado-inicial', (dados) => {
+        filaCompleta = dados.fila;
+        filtrarMinhaFila();
+    });
+
+    socket.on('atualizar-fila', (fila) => {
+        filaCompleta = fila;
+        filtrarMinhaFila();
+    });
+
+    socket.on('atualizar-painel', (dados) => {
+        // Se a chamada veio do consultório onde este médico está logado
+        if (dados.ultima && dados.ultima.destino && dados.ultima.destino.toLowerCase().includes(meuConsultorioAtual.toLowerCase())) {
+            ultimoChamadoPorMim = {
+                senha: dados.ultima.senha,
+                nome: dados.ultima.nome,
+                consultorio: meuConsultorioAtual,
+                medico: meuMedicoAtual,
+                horarioEntrada: dados.ultima.horarioEntrada
+            };
+            document.getElementById('pacienteAtual').innerText = `${dados.ultima.senha} - ${dados.ultima.nome}`;
+            document.getElementById('btnRechamar').style.display = 'block';
+        }
+    });
+
+    socket.on('aviso-medico', (msg) => alert(msg));
+</script>
+</body>
+</html>

@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Painel de Chamada - TV</title>
+    <style>
+        body {
+            background: #0f172a;
+            color: white;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+        h1 {
+            font-size: 2rem;
+            color: #38bdf8;
+            margin: 0 0 15px 0;
+            text-align: center;
+            letter-spacing: 2px;
+        }
+        .main-container {
+            display: flex;
+            gap: 20px;
+            flex: 1;
+            height: calc(100vh - 70px);
+        }
+        .card-atual {
+            flex: 1.5;
+            background: #1e293b;
+            border-radius: 16px;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            border: 2px solid #334155;
+        }
+        .label-chamando { font-size: 1.5rem; color: #94a3b8; text-transform: uppercase; }
+        .senha { font-size: 8.5rem; font-weight: bold; color: #4ade80; margin: 5px 0; line-height: 1; }
+        .nome { font-size: 3rem; color: #f8fafc; margin: 10px 0; text-align: center; }
+        .guiche { font-size: 2.5rem; color: #fbbf24; margin-top: 10px; font-weight: bold; text-align: center; }
+
+        .card-historico {
+            flex: 1;
+            background: #1e293b;
+            border-radius: 16px;
+            padding: 15px 20px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            border: 2px solid #334155;
+            max-height: 100%;
+            box-sizing: border-box;
+        }
+        .card-historico h3 {
+            margin: 0 0 10px 0;
+            color: #38bdf8;
+            font-size: 1.2rem;
+            border-bottom: 1px solid #334155;
+            padding-bottom: 8px;
+            text-align: center;
+        }
+        .lista-historico {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            overflow-y: auto;
+            flex: 1;
+            padding-right: 5px;
+        }
+        .historico-item {
+            background: #334155;
+            padding: 8px 12px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .hist-senha { font-size: 1.3rem; font-weight: bold; color: #4ade80; }
+        .hist-info { text-align: right; }
+        .hist-nome { font-size: 0.95rem; color: #f8fafc; display: block; }
+        .hist-guiche { font-size: 0.8rem; color: #fbbf24; }
+    </style>
+</head>
+<body>
+
+<h1>PAINEL DE ATENDIMENTO</h1>
+
+<div class="main-container">
+    <div class="card-atual">
+        <div class="label-chamando">Paciente Chamado</div>
+        <div id="lblSenha" class="senha">---</div>
+        <div id="lblNome" class="nome">Aguardando chamada...</div>
+        <div id="lblGuiche" class="guiche">Local: ---</div>
+    </div>
+
+    <div class="card-historico">
+        <h3>Últimos Atendimentos</h3>
+        <div class="lista-historico" id="listaHistorico">
+            <div style="text-align: center; color: #64748b; font-size: 1rem; margin-top: 20px;">Nenhum histórico recente</div>
+        </div>
+    </div>
+</div>
+
+<audio id="playerAudio" style="display: none;"></audio>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+    const socket = io();
+    const playerAudio = document.getElementById('playerAudio');
+
+    window.addEventListener('click', () => {
+        if (playerAudio.paused) {
+            playerAudio.play().catch(() => {});
+        }
+    }, { once: true });
+
+    function atualizarTela(dados) {
+        const info = dados.ultima ? dados.ultima : dados;
+        const localFinal = info.destino || info.consultorio || info.guiche || "Consultório";
+
+        document.getElementById('lblSenha').innerText = info.senha || "---";
+        document.getElementById('lblNome').innerText = info.nome || "Aguardando...";
+        document.getElementById('lblGuiche').innerText = localFinal;
+
+        if (info.audioUrl) {
+            playerAudio.src = info.audioUrl + "?t=" + new Date().getTime();
+            playerAudio.play().catch(e => {
+                console.log("Aguardando interação para áudio:", e);
+            });
+        }
+
+        const containerHistorico = document.getElementById('listaHistorico');
+        if (!dados.historico || dados.historico.length === 0) {
+            containerHistorico.innerHTML = '<div style="text-align: center; color: #64748b; font-size: 1rem; margin-top: 20px;">Nenhum histórico recente</div>';
+            return;
+        }
+
+        containerHistorico.innerHTML = dados.historico.map(item => {
+            const localHist = item.destino || item.consultorio || item.guiche || "Consultório";
+            return `
+                <div class="historico-item">
+                    <span class="hist-senha">${item.senha}</span>
+                    <div class="hist-info">
+                        <span class="hist-nome">${item.nome}</span>
+                        <span class="hist-guiche">${localHist}</span>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    socket.on('estado-inicial', (dados) => atualizarTela(dados));
+    socket.on('atualizar-painel', (dados) => atualizarTela(dados));
+</script>
+</body>
+</html>

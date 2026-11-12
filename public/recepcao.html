@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Recepção - Triagem</title>
+    <style>
+        body { background: #0f172a; color: white; font-family: Arial, sans-serif; display: flex; gap: 30px; padding: 30px; }
+        .box { background: #1e293b; padding: 25px; border-radius: 12px; flex: 1; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+        input, select, button { width: 100%; padding: 12px; margin-top: 10px; border-radius: 6px; border: none; box-sizing: border-box; font-size: 1rem; }
+        input, select { background: #334155; color: white; }
+        button { background: #3b82f6; color: white; font-weight: bold; cursor: pointer; margin-top: 20px; }
+        button:hover { background: #2563eb; }
+        .checkbox-area { display: flex; align-items: center; gap: 10px; margin-top: 15px; }
+        .checkbox-area input { width: auto; margin: 0; }
+        .item-fila { background: #334155; padding: 12px 15px; border-radius: 6px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+        .pref { border-left: 5px solid #f59e0b; }
+        label { color: #94a3b8; font-size: 0.9rem; font-weight: bold; display: block; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="box">
+    <h2>Cadastrar Paciente</h2>
+
+    <label>Nome do Paciente:</label>
+    <input type="text" id="nome" placeholder="Nome completo">
+
+    <label>Consultório de Destino:</label>
+    <select id="consultorio">
+        <option value="Consultório 01">Consultório 01</option>
+        <option value="Consultório 02">Consultório 02</option>
+        <option value="Consultório 03">Consultório 03</option>
+        <option value="Triagem">Triagem</option>
+    </select>
+
+    <label>Médico Responsável:</label>
+    <select id="medico">
+        <option value="Dr. Carlos Silva">Dr. Carlos Silva (Clínico Geral)</option>
+        <option value="Dra. Ana Souza">Dra. Ana Souza (Pediatria)</option>
+        <option value="Dr. Roberto Mendes">Dr. Roberto Mendes (Cardiologia)</option>
+        <option value="Enfermeira Juliana">Enfermeira Juliana (Triagem)</option>
+    </select>
+
+    <div class="checkbox-area">
+        <input type="checkbox" id="preferencial">
+        <label for="preferencial" style="color: white; margin:0;">Atendimento Preferencial</label>
+    </div>
+
+    <button onclick="cadastrar()">Gerar Senha e Enviar para Fila</button>
+</div>
+
+<div class="box">
+    <h2>Fila de Espera Atual (<span id="total">0</span>)</h2>
+    <div id="listaFila"></div>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+    const socket = io();
+
+    function cadastrar() {
+        const nome = document.getElementById('nome').value;
+        const consultorio = document.getElementById('consultorio').value;
+        const medico = document.getElementById('medico').value;
+        const preferencial = document.getElementById('preferencial').checked;
+
+        if (!nome) return alert("Preencha o nome do paciente!");
+
+        socket.emit('adicionar-paciente', { nome, consultorio, medico, preferencial });
+
+        document.getElementById('nome').value = '';
+        document.getElementById('preferencial').checked = false;
+        document.getElementById('nome').focus();
+    }
+
+    function renderizarFila(fila) {
+        document.getElementById('total').innerText = fila.length;
+        const container = document.getElementById('listaFila');
+        if (fila.length === 0) {
+            container.innerHTML = '<div style="color: #64748b; text-align: center; margin-top: 20px;">Fila vazia</div>';
+            return;
+        }
+        container.innerHTML = fila.map(p => `
+            <div class="item-fila ${p.preferencial ? 'pref' : ''}">
+                <div>
+                    <strong style="font-size: 1.1rem; color: #4ade80;">${p.senha}</strong> - ${p.nome}<br>
+                    <small style="color: #cbd5e1;">Entrada: ${p.horarioEntrada}</small>
+                </div>
+                <div style="text-align: right;">
+                    <span style="color: #fbbf24; display:block;">${p.consultorio}</span>
+                    <small style="color: #94a3b8;">${p.medico}</small>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    socket.on('estado-inicial', (dados) => renderizarFila(dados.fila));
+    socket.on('atualizar-fila', (fila) => renderizarFila(fila));
+</script>
+</body>
+</html>
