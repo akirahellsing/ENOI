@@ -2,162 +2,271 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Painel de Chamada - TV</title>
+    <title>Painel de Atendimento — HOSPITAL GERAL ERALDO NEVES FALCAO </title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        body {
-            background: #0f172a;
-            color: white;
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            box-sizing: border-box;
+        :root {
+            --bg-page: #f8fafc;
+            --bg-surface: #ffffff;
+            --primary: #0f4c81;
+            --primary-light: #e0f2fe;
+            --accent: #0d9488;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-subtle: #e2e8f0;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
+        
+        body { 
+            background-color: var(--bg-page); 
+            color: var(--text-main); 
+            height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
+            padding: 36px 48px; 
             overflow: hidden;
         }
-        h1 {
-            font-size: 2rem;
-            color: #38bdf8;
-            margin: 0 0 15px 0;
-            text-align: center;
-            letter-spacing: 2px;
-        }
-        .main-container {
-            display: flex;
-            gap: 20px;
-            flex: 1;
-            height: calc(100vh - 70px);
-        }
-        .card-atual {
-            flex: 1.5;
-            background: #1e293b;
-            border-radius: 16px;
-            padding: 30px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-            border: 2px solid #334155;
-        }
-        .label-chamando { font-size: 1.5rem; color: #94a3b8; text-transform: uppercase; }
-        .senha { font-size: 8.5rem; font-weight: bold; color: #4ade80; margin: 5px 0; line-height: 1; }
-        .nome { font-size: 3rem; color: #f8fafc; margin: 10px 0; text-align: center; }
-        .guiche { font-size: 2.5rem; color: #fbbf24; margin-top: 10px; font-weight: bold; text-align: center; }
 
-        .card-historico {
-            flex: 1;
-            background: #1e293b;
-            border-radius: 16px;
-            padding: 15px 20px;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-            border: 2px solid #334155;
-            max-height: 100%;
-            box-sizing: border-box;
+        .header { 
+            background: var(--bg-surface); 
+            padding: 22px 36px; 
+            border-radius: 16px; 
+            border: 1px solid var(--border-subtle);
+            box-shadow: 0 4px 20px rgba(15, 23, 42, 0.03); 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 32px;
         }
-        .card-historico h3 {
-            margin: 0 0 10px 0;
-            color: #38bdf8;
-            font-size: 1.2rem;
-            border-bottom: 1px solid #334155;
-            padding-bottom: 8px;
-            text-align: center;
-        }
-        .lista-historico {
+
+        .brand {
             display: flex;
-            flex-direction: column;
-            gap: 6px;
-            overflow-y: auto;
-            flex: 1;
-            padding-right: 5px;
-        }
-        .historico-item {
-            background: #334155;
-            padding: 8px 12px;
-            border-radius: 8px;
-            display: flex;
-            justify-content: space-between;
             align-items: center;
+            gap: 16px;
         }
-        .hist-senha { font-size: 1.3rem; font-weight: bold; color: #4ade80; }
+
+        .brand-mark {
+            width: 12px;
+            height: 36px;
+            background: var(--primary);
+            border-radius: 4px;
+        }
+
+        .header h1 { 
+            color: var(--text-main); 
+            font-size: 1.55rem; 
+            font-weight: 700; 
+            letter-spacing: -0.02em; 
+            text-transform: uppercase;
+        }
+
+        .header span.sub {
+            color: var(--text-muted);
+            font-weight: 500;
+            font-size: 1.1rem;
+            margin-left: 12px;
+            padding-left: 12px;
+            border-left: 1px solid var(--border-subtle);
+        }
+
+        .relogio { 
+            font-size: 1.65rem; 
+            font-weight: 600; 
+            color: var(--primary); 
+            font-variant-numeric: tabular-nums;
+            background: var(--bg-page);
+            padding: 8px 20px;
+            border-radius: 10px;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .main-display { 
+            display: grid; 
+            grid-template-columns: 1.6fr 1fr; 
+            gap: 32px; 
+            flex: 1; 
+            min-height: 0;
+        }
+
+        .current-box { 
+            background: var(--bg-surface); 
+            border-radius: 20px; 
+            padding: 48px; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: space-between; 
+            align-items: center; 
+            text-align: center; 
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.04); 
+            border: 1px solid var(--border-subtle);
+            position: relative;
+        }
+
+        .current-box::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            border-radius: 20px 20px 0 0;
+        }
+
+        .badge-status { 
+            background: var(--primary-light); 
+            color: var(--primary); 
+            padding: 10px 28px; 
+            border-radius: 9999px; 
+            font-weight: 700; 
+            font-size: 0.95rem; 
+            text-transform: uppercase; 
+            letter-spacing: 0.08em;
+        }
+
+        .senha-grande { 
+            font-size: 9.5rem; 
+            color: var(--primary); 
+            font-weight: 800; 
+            letter-spacing: -0.04em;
+            line-height: 1; 
+        }
+
+        .nome-grande { 
+            font-size: 2.6rem; 
+            color: var(--text-main); 
+            font-weight: 600; 
+            letter-spacing: -0.02em;
+            max-width: 90%;
+        }
+
+        .destino-grande { 
+            font-size: 2.2rem; 
+            color: #ffffff; 
+            background: var(--accent); 
+            font-weight: 700;
+            padding: 22px 40px; 
+            border-radius: 14px; 
+            width: 100%; 
+            letter-spacing: -0.01em;
+            box-shadow: 0 8px 20px rgba(13, 148, 136, 0.2);
+        }
+
+        .history-box { 
+            background: var(--bg-surface); 
+            border-radius: 20px; 
+            padding: 36px; 
+            display: flex; 
+            flex-direction: column; 
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.04); 
+            border: 1px solid var(--border-subtle);
+        }
+
+        .history-box h3 { 
+            color: var(--text-muted); 
+            font-size: 1rem; 
+            font-weight: 700;
+            border-bottom: 1px solid var(--border-subtle); 
+            padding-bottom: 18px; 
+            margin-bottom: 24px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .historico-lista { 
+            flex: 1; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 16px; 
+        }
+
+        .historico-item { 
+            background: var(--bg-page); 
+            padding: 20px 24px; 
+            border-radius: 14px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            border: 1px solid var(--border-subtle);
+            border-left: 5px solid var(--primary); 
+        }
+
+        .hist-senha { 
+            font-size: 2.1rem; 
+            color: var(--primary); 
+            font-weight: 800; 
+            letter-spacing: -0.03em;
+        }
+
         .hist-info { text-align: right; }
-        .hist-nome { font-size: 0.95rem; color: #f8fafc; display: block; }
-        .hist-guiche { font-size: 0.8rem; color: #fbbf24; }
+        .hist-nome { font-size: 1.15rem; color: var(--text-main); font-weight: 600; display: block; margin-bottom: 4px; }
+        .hist-destino { font-size: 0.95rem; color: var(--accent); font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; }
     </style>
 </head>
 <body>
 
-<h1>PAINEL DE ATENDIMENTO</h1>
-
-<div class="main-container">
-    <div class="card-atual">
-        <div class="label-chamando">Paciente Chamado</div>
-        <div id="lblSenha" class="senha">---</div>
-        <div id="lblNome" class="nome">Aguardando chamada...</div>
-        <div id="lblGuiche" class="guiche">Local: ---</div>
+    <div class="header">
+        <div class="brand">
+            <div class="brand-mark"></div>
+            <h1>HOSPITAL GERAL ERALDO NEVES FALCAO <span class="sub">Painel de Chamadas</span></h1>
+        </div>
+        <div id="relogio" class="relogio">--:--</div>
     </div>
 
-    <div class="card-historico">
-        <h3>Últimos Atendimentos</h3>
-        <div class="lista-historico" id="listaHistorico">
-            <div style="text-align: center; color: #64748b; font-size: 1rem; margin-top: 20px;">Nenhum histórico recente</div>
+    <div class="main-display">
+        <div class="current-box">
+            <span class="badge-status">Atendimento Atual</span>
+            <div id="lblSenha" class="senha-grande">---</div>
+            <div id="lblNome" class="nome-grande">Aguardando chamada</div>
+            <div id="lblGuiche" class="destino-grande">---</div>
+        </div>
+
+        <div class="history-box">
+            <h3>Chamadas Anteriores</h3>
+            <div id="listaHistorico" class="historico-lista">
+                <div style="color: #94a3b8; text-align: center; margin-top: 60px; font-weight: 500;">Nenhum registro recente</div>
+            </div>
         </div>
     </div>
-</div>
 
-<audio id="playerAudio" style="display: none;"></audio>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
 
-<script src="/socket.io/socket.io.js"></script>
-<script>
-    const socket = io();
-    const playerAudio = document.getElementById('playerAudio');
-
-    window.addEventListener('click', () => {
-        if (playerAudio.paused) {
-            playerAudio.play().catch(() => {});
+        function atualizarRelogio() {
+            const agora = new Date();
+            document.getElementById('relogio').innerText = agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
         }
-    }, { once: true });
+        setInterval(atualizarRelogio, 1000);
+        atualizarRelogio();
 
-    function atualizarTela(dados) {
-        const info = dados.ultima ? dados.ultima : dados;
-        const localFinal = info.destino || info.consultorio || info.guiche || "Consultório";
+        socket.on('atualizar-painel', (dados) => {
+            if (!dados || !dados.ultima) return;
 
-        document.getElementById('lblSenha').innerText = info.senha || "---";
-        document.getElementById('lblNome').innerText = info.nome || "Aguardando...";
-        document.getElementById('lblGuiche').innerText = localFinal;
+            const ultima = dados.ultima;
+            document.getElementById('lblSenha').innerText = ultima.senha;
+            document.getElementById('lblNome').innerText = ultima.nome;
+            document.getElementById('lblGuiche').innerText = ultima.destino;
 
-        if (info.audioUrl) {
-            playerAudio.src = info.audioUrl + "?t=" + new Date().getTime();
-            playerAudio.play().catch(e => {
-                console.log("Aguardando interação para áudio:", e);
-            });
-        }
+            if (ultima.audioUrl) {
+                const audio = new Audio(ultima.audioUrl + "?t=" + Date.now());
+                audio.play().catch(e => console.log("Erro ao reproduzir áudio:", e));
+            }
 
-        const containerHistorico = document.getElementById('listaHistorico');
-        if (!dados.historico || dados.historico.length === 0) {
-            containerHistorico.innerHTML = '<div style="text-align: center; color: #64748b; font-size: 1rem; margin-top: 20px;">Nenhum histórico recente</div>';
-            return;
-        }
-
-        containerHistorico.innerHTML = dados.historico.map(item => {
-            const localHist = item.destino || item.consultorio || item.guiche || "Consultório";
-            return `
-                <div class="historico-item">
-                    <span class="hist-senha">${item.senha}</span>
-                    <div class="hist-info">
-                        <span class="hist-nome">${item.nome}</span>
-                        <span class="hist-guiche">${localHist}</span>
+            const containerHist = document.getElementById('listaHistorico');
+            if (dados.historico && dados.historico.length > 0) {
+                containerHist.innerHTML = dados.historico.map(item => `
+                    <div class="historico-item">
+                        <span class="hist-senha">${item.senha}</span>
+                        <div class="hist-info">
+                            <span class="hist-nome">${item.nome}</span>
+                            <span class="hist-destino">${item.destino}</span>
+                        </div>
                     </div>
-                </div>
-            `;
-        }).join('');
-    }
-
-    socket.on('estado-inicial', (dados) => atualizarTela(dados));
-    socket.on('atualizar-painel', (dados) => atualizarTela(dados));
-</script>
+                `).join('');
+            }
+        });
+    </script>
 </body>
 </html>

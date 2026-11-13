@@ -2,36 +2,223 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Estação do Médico / Atendente</title>
+    <title>Estação Clínica — Hospital ENOI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { background: #0f172a; color: white; font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px; box-sizing: border-box; }
-        .container { width: 450px; background: #1e293b; padding: 30px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
-        h2 { text-align: center; color: #38bdf8; margin-top: 0; }
-        label { color: #94a3b8; font-size: 0.9rem; font-weight: bold; display: block; margin-top: 15px; }
-        select, button { width: 100%; padding: 12px; margin-top: 8px; border-radius: 8px; border: none; font-size: 1rem; box-sizing: border-box; }
-        select { background: #334155; color: white; }
+        :root {
+            --bg-page: #f8fafc;
+            --bg-surface: #ffffff;
+            --primary: #0f4c81;
+            --primary-hover: #0a365c;
+            --accent: #0d9488;
+            --accent-hover: #0f766e;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-subtle: #e2e8f0;
+        }
 
-        .btn-salvar { background: #3b82f6; color: white; font-weight: bold; cursor: pointer; margin-top: 20px; }
-        .btn-salvar:hover { background: #2563eb; }
+        * { box-sizing: border-box; font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
+        
+        body { 
+            background: var(--bg-page); 
+            color: var(--text-main); 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh; 
+            margin: 0; 
+            padding: 24px; 
+        }
+
+        .container { 
+            width: 100%;
+            max-width: 500px; 
+            background: var(--bg-surface); 
+            padding: 40px; 
+            border-radius: 16px; 
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05); 
+            border: 1px solid var(--border-subtle);
+        }
+
+        .header-login {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+
+        .header-login h2 { 
+            color: var(--text-main); 
+            margin: 0 0 6px 0; 
+            font-size: 1.4rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        .header-login p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin: 0;
+        }
+
+        label { 
+            color: #334155; 
+            font-size: 0.875rem; 
+            font-weight: 600; 
+            display: block; 
+            margin-top: 18px; 
+            margin-bottom: 8px; 
+        }
+
+        select { 
+            width: 100%; 
+            padding: 12px 16px; 
+            border-radius: 10px; 
+            font-size: 0.95rem; 
+            background: var(--bg-page); 
+            color: var(--text-main); 
+            border: 1px solid #cbd5e1; 
+            transition: all 0.2s ease;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: var(--bg-surface);
+        }
+
+        button { 
+            width: 100%; 
+            padding: 14px 20px; 
+            border-radius: 10px; 
+            font-size: 0.95rem; 
+            border: none; 
+            font-weight: 600; 
+            cursor: pointer; 
+            transition: all 0.2s ease; 
+        }
+
+        .btn-salvar { 
+            background: var(--primary); 
+            color: white; 
+            margin-top: 28px; 
+            box-shadow: 0 4px 12px rgba(15, 76, 129, 0.18);
+        }
+        .btn-salvar:hover { background: var(--primary-hover); }
 
         .painel-atendimento { display: none; }
-        .atual { background: #0f172a; padding: 20px; border-radius: 10px; text-align: center; margin: 20px 0; border: 1px solid #334155; }
-        .btn-chamar { background: #22c55e; color: white; font-weight: bold; cursor: pointer; font-size: 1.2rem; }
-        .btn-chamar:hover { background: #16a34a; }
-        .btn-rechamar { background: #f59e0b; color: white; font-weight: bold; cursor: pointer; display: none; margin-top: 10px; }
-        .btn-trocar { background: #64748b; color: white; font-size: 0.9rem; margin-top: 15px; cursor: pointer; }
 
-        .fila-item { background: #334155; padding: 10px 15px; border-radius: 6px; margin-top: 8px; display: flex; justify-content: space-between; align-items: center; }
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-subtle);
+            padding-bottom: 16px;
+            margin-bottom: 24px;
+        }
+
+        .sala-badge {
+            background: #e0f2fe;
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 0.85rem;
+            padding: 6px 14px;
+            border-radius: 8px;
+        }
+
+        .medico-nome {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .atual { 
+            background: var(--bg-page); 
+            padding: 28px 24px; 
+            border-radius: 14px; 
+            text-align: center; 
+            margin-bottom: 20px; 
+            border: 1px solid var(--border-subtle); 
+        }
+
+        .atual small {
+            color: var(--text-muted);
+            font-weight: 700;
+            font-size: 0.75rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .btn-chamar { 
+            background: var(--accent); 
+            color: white; 
+            font-size: 1.05rem; 
+            padding: 16px;
+            box-shadow: 0 4px 14px rgba(13, 148, 136, 0.22);
+        }
+        .btn-chamar:hover { background: var(--accent-hover); transform: translateY(-1px); }
+        
+        .btn-rechamar { 
+            background: #ffffff; 
+            color: var(--primary); 
+            border: 1px solid #cbd5e1;
+            display: none; 
+            margin-top: 16px; 
+            font-size: 0.875rem;
+            padding: 10px 16px;
+        }
+        .btn-rechamar:hover { background: #f1f5f9; }
+
+        .fila-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 28px;
+            margin-bottom: 12px;
+        }
+
+        .fila-header h3 {
+            margin: 0;
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #334155;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .fila-item { 
+            background: var(--bg-page); 
+            padding: 14px 16px; 
+            border-radius: 10px; 
+            margin-top: 8px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            border: 1px solid var(--border-subtle);
+            border-left: 4px solid var(--primary);
+        }
+
+        .btn-trocar { 
+            background: transparent; 
+            color: var(--text-muted); 
+            font-size: 0.85rem; 
+            margin-top: 24px; 
+            border: 1px solid var(--border-subtle);
+            padding: 10px;
+        }
+        .btn-trocar:hover { background: var(--bg-page); color: var(--text-main); }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <!-- SEÇÃO DE LOGIN / SELEÇÃO DE SALA -->
     <div id="divLogin">
-        <h2>Identificação do Médico</h2>
+        <div class="header-login">
+            <h2>Acesso ao Consultório</h2>
+            <p>Selecione a unidade de atendimento e o profissional</p>
+        </div>
 
-        <label>Selecione seu Consultório:</label>
+        <label for="selConsultorio">Consultório / Setor</label>
         <select id="selConsultorio">
             <option value="Consultório 01">Consultório 01</option>
             <option value="Consultório 02">Consultório 02</option>
@@ -39,34 +226,38 @@
             <option value="Triagem">Triagem</option>
         </select>
 
-        <label>Seu Nome / Especialidade:</label>
+        <label for="selMedico">Profissional</label>
         <select id="selMedico">
-            <option value="Dr. Carlos Silva">Dr. Carlos Silva (Clínico Geral)</option>
-            <option value="Dra. Ana Souza">Dra. Ana Souza (Pediatria)</option>
-            <option value="Dr. Roberto Mendes">Dr. Roberto Mendes (Cardiologia)</option>
-            <option value="Enfermeira Juliana">Enfermeira Juliana (Triagem)</option>
+            <option value="Dr. Carlos Silva">Dr. Carlos Silva — Clínico Geral</option>
+            <option value="Dra. Ana Souza">Dra. Ana Souza — Pediatria</option>
+            <option value="Dr. Roberto Mendes">Dr. Roberto Mendes — Cardiologia</option>
+            <option value="Enfermeira Juliana">Enfermeira Juliana — Triagem</option>
         </select>
 
-        <button class="btn-salvar" onclick="entrarConsultorio()">Entrar no Consultório</button>
+        <button class="btn-salvar" onclick="entrarConsultorio()">Iniciar Sessão</button>
     </div>
 
-    <!-- SEÇÃO DE ATENDIMENTO (Oculta até o médico fazer o login na tela) -->
     <div id="divPainel" class="painel-atendimento">
-        <h2 id="tituloSala" style="color: #4ade80; margin-bottom: 5px;">Consultório --</h2>
-        <small id="subMedico" style="color: #94a3b8; display:block; text-align:center; margin-bottom: 20px;">--</small>
+        <div class="top-bar">
+            <span id="tituloSala" class="sala-badge">Consultório --</span>
+            <span id="subMedico" class="medico-nome">--</span>
+        </div>
 
         <div class="atual">
-            <small style="color: #94a3b8;">PACIENTE EM ATENDIMENTO:</small>
-            <h1 id="pacienteAtual" style="color: #f8fafc; margin: 10px 0; font-size: 1.8rem;">Nenhum</h1>
-            <button id="btnRechamar" class="btn-rechamar" onclick="rechamar()">🔊 Chamar Novamente na TV</button>
+            <small>Em Atendimento</small>
+            <h1 id="pacienteAtual" style="color: #0f172a; margin: 12px 0 0 0; font-size: 1.65rem; font-weight: 700;">Nenhum paciente</h1>
+            <button id="btnRechamar" class="btn-rechamar" onclick="rechamar()">Repetir Chamada no Painel</button>
         </div>
 
         <button class="btn-chamar" onclick="chamarProximo()">Chamar Próximo Paciente</button>
 
-        <h3 style="margin-top: 25px; font-size: 1.1rem;">Aguardando nesta fila (<span id="qtdSala">0</span>):</h3>
-        <div id="minhaFila" style="max-height: 200px; overflow-y: auto;"></div>
+        <div class="fila-header">
+            <h3>Fila da Unidade</h3>
+            <span style="font-size: 0.85rem; font-weight: 600; color: #64748b;"><span id="qtdSala">0</span> pacientes</span>
+        </div>
+        <div id="minhaFila" style="max-height: 220px; overflow-y: auto;"></div>
 
-        <button class="btn-trocar" onclick="trocarConsultorio()">⬅ Trocar de Consultório / Sair</button>
+        <button class="btn-trocar" onclick="trocarConsultorio()">Alterar Consultório / Encerrar Sessão</button>
     </div>
 </div>
 
@@ -78,7 +269,6 @@
     let meuMedicoAtual = '';
     let ultimoChamadoPorMim = null;
 
-    // Verifica se já estava logado neste navegador anteriormente
     window.addEventListener('load', () => {
         const salvoConsultorio = localStorage.getItem('medico_consultorio');
         const salvoMedico = localStorage.getItem('medico_nome');
@@ -93,7 +283,6 @@
         meuConsultorioAtual = document.getElementById('selConsultorio').value;
         meuMedicoAtual = document.getElementById('selMedico').value;
 
-        // Salva no navegador para não precisar escolher toda vez que atualizar a página
         localStorage.setItem('medico_consultorio', meuConsultorioAtual);
         localStorage.setItem('medico_nome', meuMedicoAtual);
 
@@ -136,17 +325,19 @@
         const container = document.getElementById('minhaFila');
 
         if (filtrados.length === 0) {
-            container.innerHTML = '<div style="color: #64748b; text-align: center; padding: 15px;">Nenhum paciente na fila</div>';
+            container.innerHTML = '<div style="color: #94a3b8; text-align: center; padding: 24px; font-size: 0.9rem;">Nenhum paciente aguardando</div>';
             return;
         }
 
         container.innerHTML = filtrados.map(p => `
             <div class="fila-item">
                 <div>
-                    <strong style="color: #4ade80;">${p.senha}</strong> - ${p.nome}
+                    <strong style="color: #0f4c81;">${p.senha}</strong>
+                    <span style="color: #cbd5e1; margin: 0 6px;">|</span>
+                    <span style="color: #0f172a; font-weight: 600;">${p.nome}</span>
                 </div>
                 <div>
-                    <small style="color: #fbbf24;">${p.preferencial ? '⭐ Preferencial' : 'Normal'}</small>
+                    <small style="color: ${p.preferencial ? '#b45309' : '#64748b'}; font-weight: 600; font-size: 0.8rem;">${p.preferencial ? 'Prioritário' : 'Convencional'}</small>
                 </div>
             </div>
         `).join('');
@@ -163,7 +354,6 @@
     });
 
     socket.on('atualizar-painel', (dados) => {
-        // Se a chamada veio do consultório onde este médico está logado
         if (dados.ultima && dados.ultima.destino && dados.ultima.destino.toLowerCase().includes(meuConsultorioAtual.toLowerCase())) {
             ultimoChamadoPorMim = {
                 senha: dados.ultima.senha,
@@ -172,7 +362,7 @@
                 medico: meuMedicoAtual,
                 horarioEntrada: dados.ultima.horarioEntrada
             };
-            document.getElementById('pacienteAtual').innerText = `${dados.ultima.senha} - ${dados.ultima.nome}`;
+            document.getElementById('pacienteAtual').innerText = `${dados.ultima.senha} — ${dados.ultima.nome}`;
             document.getElementById('btnRechamar').style.display = 'block';
         }
     });
